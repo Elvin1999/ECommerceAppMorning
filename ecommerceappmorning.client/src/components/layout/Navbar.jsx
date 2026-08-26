@@ -9,6 +9,9 @@ import {
   Typography,
 } from "@mui/material";
 
+import { getCart } from "../../services/cartService";
+import { useEffect, useState } from "react";
+
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import PersonOutlineIcon from "@mui/icons-material/Person2Outlined";
@@ -16,6 +19,29 @@ import { useNavigate } from "react-router-dom";
 
 function Navbar() {
   const navigate = useNavigate();
+
+  const userId = 1;
+
+  const [cartCount, setCartCount] = useState(0);
+
+  useEffect(() => {
+    const loadCart = async () => {
+      try {
+        const cart = await getCart(userId);
+
+        const count = cart.items.reduce(
+          (total, item) => total + item.quantity,
+          0
+        );
+
+        setCartCount(count);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    loadCart();
+  }, []);
 
   return (
     <AppBar
@@ -69,11 +95,11 @@ function Navbar() {
           </IconButton>
 
           <IconButton onClick={() => navigate("/cart")}>
-            <Badge badgeContent={0} color="error">
+            <Badge badgeContent={cartCount} color="error">
               <ShoppingCartIcon />
             </Badge>
           </IconButton>
-
+          
           <IconButton>
             <PersonOutlineIcon />
           </IconButton>
